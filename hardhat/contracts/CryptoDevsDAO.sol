@@ -81,4 +81,50 @@ contract CryptoDevsDAO is Ownable {
         numProposals++;
         return numProposals - 1;
     }
+
+    // allows function to be called if deadline not exceeded
+    modifier activeProposalOnly(uint256 proposalIndex) {
+        require(
+            proposals[proposalIndex].deadline > block.timestamp,
+            "DEADLINE_EXCEEDED"
+        );
+        _;
+    }
+
+    // possible options for a vote
+    enum Vote {
+        YAY, // = 0
+        NAY // = 1
+    }
+
+    // allows an nft holder to cast their vote on an active proposal
+    // param proposalindex - index of proposal to vote on in proposals array
+    // param vote - type of vote they  want to cast
+    function voteOnProposal(uint proposalIndex, Vote vote)
+        external
+        nftHolderOnly
+        activeProposalOnly(proposalIndex)
+    {
+        Proposal storage proposal = proposals[proposalIndex];
+
+        uint voterNFTBalance = cryptoDevsNFT.balanceOf(msg.sender);
+        uint numVotes = 0;
+
+        // calculate how many nfts are owned by voter
+        // that havent been used for voting on this proposal
+        for (uint i = 0; i < voterNFTBalance; i++) {
+            uint tokenId = cryptoDevsNFT.tokenOfOwnerByIndex(msg.sender, i);
+            if (proposal.voters[tokenId] == false) {
+                numVotes++;
+                proposal.voters[tokenId] = true;
+            }
+        }
+        require(numVotes > 0, "ALREADY VOTED");
+
+        if (vote == Vote.YAY) {
+            proposal.yayVotes += numVotes;
+        } else {
+            proposal.nayVotes += numVotes;
+        }
+    }
 }
