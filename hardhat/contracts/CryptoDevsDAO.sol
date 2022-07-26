@@ -43,4 +43,25 @@ contract CryptoDevsDAO is Ownable {
         // mapping of CryptoDevsNFT tokenIDs to booleans indicating whether that NFT has already been used to cast a vote or not
         mapping(uint => bool) voters;
     }
+
+    // mapping of proposal ID to proposal
+    mapping(uint => Proposal) public proposals;
+    // number of proposals created
+    uint public numProposals;
+
+    // initialization
+    IFakeNFTMarketplace nftMarketplace;
+    ICryptoDevsNFT cryptoDevsNFT;
+
+    // payable here accepts an eth deposit when it is being deployed
+    constructor(address _nftMarketplace, address _cryptoDevsNFT) payable {
+        nftMarketplace = IFakeNFTMarketplace(_nftMarketplace);
+        cryptoDevsNFT = ICryptoDevsNFT(_cryptoDevsNFT);
+    }
+
+    // only allows functions to be called by our nft holders
+    modifier nftHolderOnly() {
+        require(cryptoDevsNFT.balanceOf(msg.sender) > 0, "NOT_A_DAO_MEMBER");
+        _;
+    }
 }
