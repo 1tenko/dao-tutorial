@@ -19,10 +19,28 @@ interface ICryptoDevsNFT {
     // param 'owner' - address to fetch number of nfts for
     function balanceOf(address owner) external view returns (uint256);
 
+    // returns a tokenID at given index for owner
     function tokenOfOwnerByIndex(address owner, uint256 index)
         external
         view
         returns (uint256);
 }
 
-contract CryptoDevsDAO is Ownable {}
+contract CryptoDevsDAO is Ownable {
+    struct Proposal {
+        // tokenId of the nft to purchase from marketplace if the proposal passes
+        uint nftTokenId;
+        // UNIX timestamp until which this proposal is active
+        // proposal can be executed after the deadline has been exceeded
+        uint deadline;
+        // number of yay votes for this proposal
+        uint yayVotes;
+        // number of nayVotes for this proposal
+        uint nayVotes;
+        // whether or not proposal has been executes
+        // cannot be executed before deadline has been exceeded
+        bool executed;
+        // mapping of CryptoDevsNFT tokenIDs to booleans indicating whether that NFT has already been used to cast a vote or not
+        mapping(uint => bool) voters;
+    }
+}
