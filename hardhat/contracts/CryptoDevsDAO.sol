@@ -14,4 +14,15 @@ interface IFakeNFTMarketplace {
     function purchase(uint256 _tokenId) external payable;
 }
 
+interface ICryptoDevsNFT {
+    // returns number of nfts owned by a single address
+    // param 'owner' - address to fetch number of nfts for
+    function balanceOf(address owner) external view returns (uint256);
+
+    function tokenOfOwnerByIndex(address owner, uint256 index)
+        external
+        view
+        returns (uint256);
+}
+
 contract CryptoDevsDAO is Ownable {}
