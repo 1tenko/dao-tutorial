@@ -127,4 +127,37 @@ contract CryptoDevsDAO is Ownable {
             proposal.nayVotes += numVotes;
         }
     }
+
+    // allows function to be called if given proposals' deadline HAS been exceeded
+    // and if proposal has not yet been executed
+    modifier inactiveProposalOnly(uint proposalIndex) {
+        require(
+            proposals[proposalIndex].deadline <= block.timestamp,
+            "DEADLINE_NOT_EXCEEDED"
+        );
+        require(
+            proposals[proposalIndex].executed == false,
+            "PROPOSAL_ALREADY_EXECUTED"
+        );
+        _;
+    }
+
+    // allows nft holder to execute a proposal after its deadline has been exceeded
+    // param proposalIndex - index of proposal to execute in proposals array
+    function executeProposal(uint proposalIndex)
+        external
+        nftHolderOnly
+        inactiveProposalOnly(proposalIndex)
+    {
+        Proposal storage proposal = proposals[proposalIndex];
+
+        // if proposal has more yay votes than nay votes
+        // purchase nft from marketplace
+        if (proposal.yayVotes > proposal.nayVotes) {
+            uint nftPrice = nftMarketplace.getPrice();
+            require(address(this).balance >= nftPrice, "NOT_ENOUGH_FUNDS");
+            nftMarketplace.purchase{value: nftPrice}(proposal.nftTokenId);
+        }
+        proposal.executed = true;
+    }
 }
