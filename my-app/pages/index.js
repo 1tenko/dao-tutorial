@@ -57,6 +57,24 @@ export default function Home() {
     return web3Provider;
   };
 
+  // return a dao contract instance given a provider/signer
+  const getDaoContractInstance = (providerOrSigner) => {
+    return new Contract(
+      CRYPTODEVS_DAO_CONTRACT_ADDRESS,
+      CRYPTODEVS_DAO_ABI,
+      providerOrSigner
+    );
+  };
+
+  // return a crypto dev nft contract instance given a provider/signer
+  const getCryptodevsNFTContractInstance = (providerOrSigner) => {
+    return new Contract(
+      CRYPTODEVS_NFT_CONTRACT_ADDRESS,
+      CRYPTODEVS_NFT_ABI,
+      providerOrSigner
+    );
+  };
+
   return (
     <div className={styles.container}>
       <Head>
