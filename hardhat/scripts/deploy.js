@@ -4,7 +4,7 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const { ethers } = require("ethers");
+const { ethers } = require("hardhat");
 const { CRYPTODEVS_NFT_CONTRACT_ADDRESS } = require("../constants");
 
 async function main() {
@@ -18,7 +18,7 @@ async function main() {
   console.log("FakeNFTMarketplace deployed to: ", fakeNftMarketplace.address);
 
   // deploy dao contract
-  const CryptoDevsDAO = await ethers.ContractFactory("CryptoDevsDAO");
+  const CryptoDevsDAO = await ethers.getContractFactory("CryptoDevsDAO");
   const cryptoDevsDAO = await CryptoDevsDAO.deploy(
     fakeNftMarketplace.address,
     CRYPTODEVS_NFT_CONTRACT_ADDRESS,
