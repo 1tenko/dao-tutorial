@@ -36,7 +36,26 @@ export default function Home() {
   // true if user has connected their wallet
   const [walletConnected, setWalletConnected] = useState(false);
 
-  const web3ModalRed = useRef();
+  const web3ModalRef = useRef();
+
+  // fetches provider or signer instance from metamask
+  const getProviderOrSigner = async (needSigner = false) => {
+    const provider = await web3ModalRef.current.connect();
+    const web3Provider = new providers.Web3Provider(provider);
+
+    const { chainId } = await web3Provider.getNetwork();
+
+    if (chainId !== 4) {
+      window.alert("Please switch to the Rinkeby network!");
+      throw new Error("Please switch to the Rinkeby network");
+    }
+
+    if (needSigner) {
+      const signer = web3Provider.getSigner();
+      return signer;
+    }
+    return web3Provider;
+  };
 
   return (
     <div className={styles.container}>
