@@ -198,6 +198,58 @@ export default function Home() {
     }
   };
 
+  // calls 'executeProposal()' in contract using passed  proposal id
+  const executeProposal = async (proposalId) => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDaoContractInstance(signer);
+
+      const txn = await daoContract.executeProposal(proposalId);
+      setLoading(true);
+      await txn.wait();
+      setLoading(false);
+      await fetchAllProposals();
+    } catch (error) {
+      console.error(error);
+      window.alert(error.data.message);
+    }
+  };
+
+  // when wallet connects or disconnects
+  // prompts user to connect wallet
+  // calls helper functions for info
+  useEffect(() => {
+    if (!walletConnected) {
+      web3ModalRef.current = new Web3Modal({
+        network: "rinkeby",
+        providerOptions: {},
+        disableInjectedProvider: false,
+      });
+
+      connectWallet().then(() => {
+        getDAOTreasuryBalance();
+        getUserNFTBalance();
+        getNumProposalsInDAO();
+      });
+    }
+  }, [walletConnected]);
+
+  // re-fetch all proposals in dao when user switched to view proposals tab
+  useEffect(() => {
+    if (selectedTab === "View Proposals") {
+      fetchAllProposals();
+    }
+  }, [selectedTab]);
+
+  const renderTabs = () => {
+    if (selectedTab === "CreateProposal") {
+      return renderCreateProposalTab();
+    } else if (selectedTab === "View Proposals") {
+      return renderViewProposalsTab();
+    }
+    return null;
+  };
+
   return (
     <div className={styles.container}>
       <Head>
