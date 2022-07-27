@@ -4,21 +4,33 @@
 // You can also run a script with `npx hardhat run <script>`. If you do that, Hardhat
 // will compile your contracts, add the Hardhat Runtime Environment's members to the
 // global scope, and execute the script.
-const hre = require("hardhat");
+const { ethers } = require("ethers");
+const { CRYPTODEVS_NFT_CONTRACT_ADDRESS } = require("../constants");
 
 async function main() {
-  const currentTimestampInSeconds = Math.round(Date.now() / 1000);
-  const ONE_YEAR_IN_SECS = 365 * 24 * 60 * 60;
-  const unlockTime = currentTimestampInSeconds + ONE_YEAR_IN_SECS;
+  // deploy nftMarketplace contract first
+  const FakeNFTMarketplace = await ethers.getContractFactory(
+    "FakeNFTMarketplace"
+  );
+  const fakeNftMarketplace = await FakeNFTMarketplace.deploy();
+  await fakeNftMarketplace.deployed();
 
-  const lockedAmount = hre.ethers.utils.parseEther("1");
+  console.log("FakeNFTMarketplace deployed to: ", fakeNftMarketplace.address);
 
-  const Lock = await hre.ethers.getContractFactory("Lock");
-  const lock = await Lock.deploy(unlockTime, { value: lockedAmount });
+  // deploy dao contract
+  const CryptoDevsDAO = await ethers.ContractFactory("CryptoDevsDAO");
+  const cryptoDevsDao = await CryptoDevsDAO.deploy(
+    fakeNftMarketplace.address,
+    CRYPTODEVS_NFT_CONTRACT_ADDRESS,
+    {
+      // assumes your account has at least 0.01 eth
+      value: ethers.utils.parseEther("0.01"),
+    }
+  );
 
-  await lock.deployed();
+  await cryptoDevsDao.deployed();
 
-  console.log("Lock with 1 ETH deployed to:", lock.address);
+  console.log("CryptoDevsDAO deployed to: ", cryptoDevsDAO.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
