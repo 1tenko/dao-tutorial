@@ -136,6 +136,65 @@ export default function Home() {
       setLoading(false);
     } catch (error) {
       console.error(error);
+      window.alert(error.data.message);
+    }
+  };
+
+  // fetch and parse one proposal from dao contract given proposal ID
+  // converts returned data into JS object with value we can use
+  const fetchProposalById = async (id) => {
+    try {
+      const provider = await getProviderOrSigner();
+      const daoContract = getDaoContractInstance(provider);
+
+      const proposal = await daoContract.proposals(id);
+      const parsedProposal = {
+        proposalId: id,
+        nftTokenId: proposal.nftTokenId.toString(),
+        deadline: new Date(parseInt(proposal.deadline.toString()) * 1000),
+        yayVotes: proposal.yayVotes.toString(),
+        nayVotes: proposal.nayVotes.toString(),
+        executed: proposal.executed,
+      };
+      return parsedProposal;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // runs a loop 'numProposals' times to fetch all proposals in dao
+  // sets the 'proposals' state variable
+  const fetchAllProposals = async () => {
+    try {
+      const proposals = [];
+      for (let i = 0; i < numProposals; i++) {
+        const proposal = await fetchProposalById(i);
+        proposals.push(proposal);
+      }
+
+      setProposals(proposals);
+      return proposals;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // calls 'voteOnProposal()' in the contract using passed proposal ID and vote
+  const voteOnProposal = async (proposalId, _vote) => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDaoContractInstance(signer);
+
+      let vote = _vote === "YAY" ? 0 : 1;
+
+      const txn = await daoContract.voteOnProposal(proposalId, vote);
+      setLoading(true);
+      await txn.wait();
+      setLoading(false);
+      await fetchAllProposals();
+    } catch {
+      console.error(error);
+      window.alert(error.data.message);
     }
   };
 
