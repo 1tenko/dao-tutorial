@@ -25,7 +25,7 @@ export default function Home() {
   const [nftBalance, setNftBalance] = useState(0);
 
   // fake nft token ID to purchase. Used when creating a proposal
-  const [fakeNftTokenid, setFakeNftTokenid] = useState("");
+  const [fakeNftTokenId, setFakeNftTokenId] = useState("");
 
   // one of 'Create Proposal' or 'View Proposals'
   const [selectedTab, setSelectedTab] = useState("");
@@ -118,6 +118,22 @@ export default function Home() {
       const nftContract = getCryptodevsNFTContractInstance(signer);
       const balance = await nftContract.balanceOf(signer.getAddress());
       setNftBalance(parseInt(balance.toString()));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // calls 'createProposal()' in contract using tokenId from fakeNftTokenId
+  const createProposal = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = getDaoContractInstance(signer);
+      const txn = await daoContract.createProposal(fakeNftTokenId);
+
+      setLoading(true);
+      await txn.wait();
+      await getNumProposalsInDAO();
+      setLoading(false);
     } catch (error) {
       console.error(error);
     }
