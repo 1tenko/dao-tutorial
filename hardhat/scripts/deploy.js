@@ -19,7 +19,7 @@ async function main() {
 
   // deploy dao contract
   const CryptoDevsDAO = await ethers.ContractFactory("CryptoDevsDAO");
-  const cryptoDevsDao = await CryptoDevsDAO.deploy(
+  const cryptoDevsDAO = await CryptoDevsDAO.deploy(
     fakeNftMarketplace.address,
     CRYPTODEVS_NFT_CONTRACT_ADDRESS,
     {
