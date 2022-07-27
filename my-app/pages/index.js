@@ -75,6 +75,29 @@ export default function Home() {
     );
   };
 
+  // helper function to connect wallet
+  const connectWallet = async () => {
+    try {
+      await getProviderOrSigner();
+      setWalletConnected(true);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // reads eth balance of dao contract and sets 'treasuryBalance' state variable
+  const getDAOTreasuryBalance = async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const balance = await provider.getBalance(
+        CRYPTODEVS_DAO_CONTRACT_ADDRESS
+      );
+      setTreasuryBalance(balance.toString());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <Head>
