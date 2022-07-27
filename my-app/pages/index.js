@@ -98,6 +98,31 @@ export default function Home() {
     }
   };
 
+  // reads number of proposals in the DAO contract and sets 'numProposals' state
+  const getNumProposalsInDAO = async () => {
+    try {
+      const provider = await getProviderOrSigner();
+      const contract = getDaoContractInstance(provider);
+
+      const daoNumProposals = await contract.numProposals();
+      setNumProposals(daoNumProposals.toString());
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // reads balance of users NFTs and sets 'nftBalance' state
+  const getUserNFTBalance = async () => {
+    try {
+      const signer = await getProviderOrSigner(true);
+      const nftContract = getCryptodevsNFTContractInstance(signer);
+      const balance = await nftContract.balanceOf(signer.getAddress());
+      setNftBalance(parseInt(balance.toString()));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={styles.container}>
       <Head>
