@@ -241,37 +241,39 @@ export default function Home() {
     }
   }, [selectedTab]);
 
-  const renderTabs = () => {
-    if (selectedTab === "CreateProposal") {
+  // Render the contents of the appropriate tab based on `selectedTab`
+  function renderTabs() {
+    if (selectedTab === "Create Proposal") {
       return renderCreateProposalTab();
     } else if (selectedTab === "View Proposals") {
       return renderViewProposalsTab();
     }
     return null;
-  };
+  }
 
-  const renderCreateProposalTab = () => {
+  // Renders the 'Create Proposal' tab content
+  function renderCreateProposalTab() {
     if (loading) {
       return (
         <div className={styles.description}>
-          Loading.. Waiting for transaction
+          Loading... Waiting for transaction...
         </div>
       );
     } else if (nftBalance === 0) {
       return (
-        <div>
+        <div className={styles.description}>
           You do not own any CryptoDevs NFTs. <br />
           <b>You cannot create or vote on proposals</b>
         </div>
       );
     } else {
       return (
-        <div>
-          <label> Fake NFT Token ID to Purchase: </label>
+        <div className={styles.container}>
+          <label>Fake NFT Token ID to Purchase: </label>
           <input
             placeholder="0"
             type="number"
-            onChange={(e) => setFakeNFtTokenId(e.target.value)}
+            onChange={(e) => setFakeNftTokenId(e.target.value)}
           />
           <button className={styles.button2} onClick={createProposal}>
             Create
@@ -279,10 +281,68 @@ export default function Home() {
         </div>
       );
     }
-  };
+  }
+
+  // Renders the 'View Proposals' tab content
+  function renderViewProposalsTab() {
+    if (loading) {
+      return (
+        <div className={styles.description}>
+          Loading... Waiting for transaction...
+        </div>
+      );
+    } else if (proposals.length === 0) {
+      return (
+        <div className={styles.description}>No proposals have been created</div>
+      );
+    } else {
+      return (
+        <div>
+          {proposals.map((p, index) => (
+            <div key={index} className={styles.proposalCard}>
+              <p>Proposal ID: {p.proposalId}</p>
+              <p>Fake NFT to Purchase: {p.nftTokenId}</p>
+              <p>Deadline: {p.deadline.toLocaleString()}</p>
+              <p>Yay Votes: {p.yayVotes}</p>
+              <p>Nay Votes: {p.nayVotes}</p>
+              <p>Executed?: {p.executed.toString()}</p>
+              {p.deadline.getTime() > Date.now() && !p.executed ? (
+                <div className={styles.flex}>
+                  <button
+                    className={styles.button2}
+                    onClick={() => voteOnProposal(p.proposalId, "YAY")}
+                  >
+                    Vote YAY
+                  </button>
+                  <button
+                    className={styles.button2}
+                    onClick={() => voteOnProposal(p.proposalId, "NAY")}
+                  >
+                    Vote NAY
+                  </button>
+                </div>
+              ) : p.deadline.getTime() < Date.now() && !p.executed ? (
+                <div className={styles.flex}>
+                  <button
+                    className={styles.button2}
+                    onClick={() => executeProposal(p.proposalId)}
+                  >
+                    Execute Proposal{" "}
+                    {p.yayVotes > p.nayVotes ? "(YAY)" : "(NAY)"}
+                  </button>
+                </div>
+              ) : (
+                <div className={styles.description}>Proposal Executed</div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+  }
 
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>CryptoDevs DAO</title>
         <meta name="description" content="CryptoDevs DAO" />
@@ -296,7 +356,7 @@ export default function Home() {
           <div className={styles.description}>
             Your CryptoDevs NFT Balance: {nftBalance}
             <br />
-            Treasury Balance : {formatEther(treasuryBalance)} ETH
+            Treasury Balance: {formatEther(treasuryBalance)} ETH
             <br />
             Total Number of Proposals: {numProposals}
           </div>
@@ -320,6 +380,7 @@ export default function Home() {
           <img className={styles.image} src="/cryptodevs/0.svg" />
         </div>
       </div>
+
       <footer className={styles.footer}>
         Made with &#10084; by Crypto Devs
       </footer>

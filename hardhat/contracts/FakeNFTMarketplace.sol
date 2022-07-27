@@ -6,7 +6,7 @@ contract FakeNFTMarketplace {
     mapping(uint256 => address) public tokens;
 
     // sets the purchase price for each fake NFT
-    uint nftPrice = 0.1 ether;
+    uint nftPrice = 0.01 ether;
 
     // accepts ETH and marks the owner of the given tokenID as the caller address
     // _tokenId is the fake nft token id to purchase

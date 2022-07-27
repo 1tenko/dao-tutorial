@@ -23,8 +23,7 @@ async function main() {
     fakeNftMarketplace.address,
     CRYPTODEVS_NFT_CONTRACT_ADDRESS,
     {
-      // assumes your account has at least 0.01 eth
-      value: ethers.utils.parseEther("0.01"),
+      value: ethers.utils.parseEther("0.1"),
     }
   );
 
