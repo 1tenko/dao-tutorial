@@ -28,7 +28,7 @@ async function main() {
     }
   );
 
-  await cryptoDevsDao.deployed();
+  await cryptoDevsDAO.deployed();
 
   console.log("CryptoDevsDAO deployed to: ", cryptoDevsDAO.address);
 }
